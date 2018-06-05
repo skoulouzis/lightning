@@ -54,7 +54,8 @@ public class QualityControlledRabbitMessagePacker extends BaseWindowedBolt {
 
             message = messagehead + datamessage + "\"}]}";
             System.out.println("Sending Quality Controlled Message Package");
-            System.err.println(message);
+//            System.err.println(message);
+            System.err.println(jsonObs);
 
         } catch (JsonProcessingException ex) {
             Logger.getLogger(QualityControlledRabbitMessagePacker.class.getName()).log(Level.SEVERE, null, ex);

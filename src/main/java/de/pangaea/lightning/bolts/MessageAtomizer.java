@@ -38,7 +38,6 @@ public class MessageAtomizer extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        System.out.println("Atomizer..");
         JsonNode node = (JsonNode) tuple.getValueByField("observationmessage");
         JsonNode mess = node;
         JsonNode messageAttributes = mess.get("attributes");
