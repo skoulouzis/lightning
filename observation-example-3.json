@@ -1,7 +1,7 @@
 {
-        "madeBySensor": "http://example.org/sensors/1",
+        "madeBySensor": "http://dataportals.pangaea.de/sml/db/ptube/ssw_59e9a8161cfb2.xml",
         "hasFeatureOfInterest": "http://example.org/features/1",
-	"observedProperty": "http://example.org/properties/1",
+	"observedProperty": "http://purl.obolibrary.org/obo/PATO_0000146",
 	"resultTime": "2017-01-01T00:00:00.000+02:00",
         "hasResult": {
             "numericValue": 12.5

@@ -10,6 +10,7 @@ envri_publisher01 = 'f50b7c315eefb3fe7fde05c00751be0115e685a6'
 
 with open(xml_file, 'r') as f:
     xml_file_data = f.read()
+    print xml_file_data
 
 attributes_json = {}
 attributes_json['type'] = 'InsertResult'
