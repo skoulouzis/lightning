@@ -75,19 +75,10 @@ public class RabbitMessageReader extends BaseRichSpout {
                 + "}";
 //            JsonNode node = mapper.readTree(jsonString);
 
-        _collector.emit(new Values(jsonString));
-
+        _collector.emit(new Values(jsonString), jsonString.hashCode());
+//        this.ack(jsonString.hashCode());
     }
 
-    @Override
-    public void ack(Object msgId) {
-
-    }
-
-    @Override
-    public void fail(Object msgId) {
-
-    }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
