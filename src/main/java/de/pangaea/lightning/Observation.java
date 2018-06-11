@@ -1,140 +1,135 @@
 package de.pangaea.lightning;
 
+import java.util.HashMap;
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    "madeBySensor",
+    "observedProperty",
+    "qualityOfObservation",
+    "id",
+    "hasResult",
+    "resultTime",
+    "featureOfInterest",
+    "resultUnit",
+    "resultValue"
+})
 public class Observation {
 
+    @JsonProperty("madeBySensor")
     private String madeBySensor;
+    @JsonProperty("observedProperty")
     private String observedProperty;
-    private String hasFeatureOfInterest;
-    private int qualityOfObservation = 0; //0=good; 1=bad
-    //public ArrayList<Rating> qualityRating = new ArrayList(); 
-    private String id;
-    private Result hasResult;
+    @JsonProperty("qualityOfObservation")
+    private Integer qualityOfObservation;
+    @JsonProperty("id")
+    private Object id;
+    @JsonProperty("hasResult")
+    private HasResult hasResult;
+    @JsonProperty("resultTime")
     private String resultTime;
+    @JsonProperty("featureOfInterest")
+    private String featureOfInterest;
+    @JsonProperty("resultUnit")
+    private String resultUnit;
+    @JsonProperty("resultValue")
+    private Float resultValue;
 
-    //schema.org style quality annotation
-    public class Rating {
-
-        public String reviewAspect;
-        public int ratingValue;
-    }
-
-    public class Result {
-
-        private String id;
-
-        public Result(float value, String unit) {
-            this.numericValue = value;
-            this.unit = unit;
-        }
-
-        public Result(float value) {
-            this.numericValue = value;
-        }
-
-        private float numericValue;
-        private String unit;
-
-        public float getNumericValue() {
-            return numericValue;
-        }
-
-        public void setNumericValue(float numericValue) {
-            this.numericValue = numericValue;
-        }
-
-        public String getUnit() {
-            return unit;
-        }
-
-        public void setUnit(String unit) {
-            this.unit = unit;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-    }
-
-    public Observation() {
-
-    }
-
-    public Observation(String sensor, String property, float value) {
-        this.setMadeBySensor(sensor);
-        this.setObservedProperty(property);
-        this.setHasResult(new Result(value));
-    }
-
-    public String getFeatureOfInterest() {
-        return hasFeatureOfInterest;
-    }
-
-    public void setFeatureOfInterest(String hasFeatureOfInterest) {
-        this.hasFeatureOfInterest = hasFeatureOfInterest;
-    }
-
-    public void setResultUnit(String unit) {
-        this.getHasResult().setUnit(unit);
-    }
-
-    public String getResultUnit() {
-        return this.getHasResult().getUnit();
-    }
-
-    public float getResultValue() {
-        return this.getHasResult().getNumericValue();
-    }
-
-    public String getResultTime() {
-        return resultTime;
-    }
-
-    public void setResultTime(String resultTime) {
-        this.resultTime = resultTime;
-    }
-
-    public String getObservedProperty() {
-        return observedProperty;
-    }
-
-    public void setObservedProperty(String observedProperty) {
-        this.observedProperty = observedProperty;
-    }
-
+    @JsonProperty("madeBySensor")
     public String getMadeBySensor() {
         return madeBySensor;
     }
 
+    @JsonProperty("madeBySensor")
     public void setMadeBySensor(String madeBySensor) {
         this.madeBySensor = madeBySensor;
     }
 
-    public String getId() {
-        return id;
+    @JsonProperty("observedProperty")
+    public String getObservedProperty() {
+        return observedProperty;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @JsonProperty("observedProperty")
+    public void setObservedProperty(String observedProperty) {
+        this.observedProperty = observedProperty;
     }
 
-    public Result getHasResult() {
-        return hasResult;
-    }
-
-    public void setHasResult(Result hasResult) {
-        this.hasResult = hasResult;
-    }
-
-    public int getQualityOfObservation() {
+    @JsonProperty("qualityOfObservation")
+    public Integer getQualityOfObservation() {
         return qualityOfObservation;
     }
 
-    public void setQualityOfObservation(int qualityOfObservation) {
+    @JsonProperty("qualityOfObservation")
+    public void setQualityOfObservation(Integer qualityOfObservation) {
         this.qualityOfObservation = qualityOfObservation;
+    }
+
+    @JsonProperty("id")
+    public Object getId() {
+        return id;
+    }
+
+    @JsonProperty("id")
+    public void setId(Object id) {
+        this.id = id;
+    }
+
+    @JsonProperty("hasResult")
+    public HasResult getHasResult() {
+        return hasResult;
+    }
+
+    @JsonProperty("hasResult")
+    public void setHasResult(HasResult hasResult) {
+        this.hasResult = hasResult;
+    }
+
+    @JsonProperty("resultTime")
+    public String getResultTime() {
+        return resultTime;
+    }
+
+    @JsonProperty("resultTime")
+    public void setResultTime(String resultTime) {
+        this.resultTime = resultTime;
+    }
+
+    @JsonProperty("featureOfInterest")
+    public String getFeatureOfInterest() {
+        return featureOfInterest;
+    }
+
+    @JsonProperty("featureOfInterest")
+    public void setFeatureOfInterest(String featureOfInterest) {
+        this.featureOfInterest = featureOfInterest;
+    }
+
+    @JsonProperty("resultUnit")
+    public String getResultUnit() {
+        return resultUnit;
+    }
+
+    @JsonProperty("resultUnit")
+    public void setResultUnit(String resultUnit) {
+        this.resultUnit = resultUnit;
+    }
+
+    @JsonProperty("resultValue")
+    public Float getResultValue() {
+        return resultValue;
+    }
+
+    @JsonProperty("resultValue")
+    public void setResultValue(Float resultValue) {
+        this.resultValue = resultValue;
     }
 
 }

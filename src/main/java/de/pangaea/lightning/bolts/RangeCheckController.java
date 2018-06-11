@@ -5,8 +5,12 @@
  */
 package de.pangaea.lightning.bolts;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.pangaea.lightning.Observation;
+import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -18,6 +22,7 @@ import org.apache.storm.tuple.Values;
 public class RangeCheckController extends BaseRichBolt {
 
     OutputCollector _collector;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -26,24 +31,31 @@ public class RangeCheckController extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        Observation rangeCheckedObservation = (Observation) tuple.getValue(0);
-        float[] range = (float[]) tuple.getValue(1);
-        float value = rangeCheckedObservation.getResultValue();
-        if (range[0] < range[1]) {
-            if (value >= range[0] && value <= range[1]) {
-                //System.out.println("Passed: "+value+" ("+range[0]+" - "+range[1]+")");
-                if (rangeCheckedObservation.getQualityOfObservation() != 1) {
-                    rangeCheckedObservation.setQualityOfObservation(0);
+        try {
+            //        Observation rangeCheckedObservation = (Observation) tuple.getValue(0);
+            String jsonObservation = (String) tuple.getValue(0);
+            Observation rangeCheckedObservation = mapper.readValue(jsonObservation, Observation.class);
+            float[] range = (float[]) tuple.getValue(1);
+            float value = rangeCheckedObservation.getResultValue();
+            if (range[0] < range[1]) {
+                if (value >= range[0] && value <= range[1]) {
+                    //System.out.println("Passed: "+value+" ("+range[0]+" - "+range[1]+")");
+                    if (rangeCheckedObservation.getQualityOfObservation() != 1) {
+                        rangeCheckedObservation.setQualityOfObservation(0);
+                    }
+                } else {
+                    //System.out.println("Failed: "+value);
+                    rangeCheckedObservation.setQualityOfObservation(1);
                 }
-            } else {
-                //System.out.println("Failed: "+value);					
-                rangeCheckedObservation.setQualityOfObservation(1);
             }
+            Object observedProperty = tuple.getValue(2);
+            Object madeBySensor = tuple.getValue(3);
+            String jsonRangeCheckedObservation = mapper.writeValueAsString(rangeCheckedObservation);
+            _collector.emit(new Values(jsonRangeCheckedObservation, observedProperty, madeBySensor));
+            _collector.ack(tuple);
+        } catch (IOException ex) {
+            Logger.getLogger(RangeCheckController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Object observedProperty = tuple.getValue(2);
-        Object madeBySensor = tuple.getValue(3);
-        _collector.emit(new Values(rangeCheckedObservation, observedProperty, madeBySensor));
-        _collector.ack(tuple);
     }
 
     @Override

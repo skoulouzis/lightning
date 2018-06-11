@@ -41,7 +41,7 @@ public class InsertResultMessage extends ENVRI_NRTQualityCheck {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(url.openStream());
+//        Document doc = builder.parse(url.openStream());
         //String sensorID=doc.getElementsByTagName("om:procedure").item(0).getAttributes().item(0).getTextContent();
 
     }

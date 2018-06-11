@@ -6,6 +6,8 @@
 package de.pangaea.lightning.bolts;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.pangaea.lightning.HasResult;
 import de.pangaea.lightning.InsertResultMessage;
 import de.pangaea.lightning.Observation;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import org.xml.sax.SAXException;
 public class MessageAtomizer extends BaseRichBolt {
 
     OutputCollector _collector;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -38,42 +41,56 @@ public class MessageAtomizer extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        JsonNode node = (JsonNode) tuple.getValueByField("observationmessage");
-        JsonNode mess = node;
-        JsonNode messageAttributes = mess.get("attributes");
+        try {
+//        JsonNode node = (JsonNode) tuple.getValueByField("observationmessage");
+            String jsonString = (String) tuple.getValueByField("observationmessage");
+            JsonNode mess = mapper.readTree(jsonString);
+            JsonNode messageAttributes = mess.get("attributes");
 
 //        String messageType = messageAttributes.get("type").asText();
-        String madeBySensor = messageAttributes.get("madeBySensor").asText();
-        String observedProperty = messageAttributes.get("observedProperty").asText();
-        String featureOfInterest = messageAttributes.get("hasFeatureOfInterest").asText();
+            String madeBySensor = messageAttributes.get("madeBySensor").asText();
+            String observedProperty = messageAttributes.get("observedProperty").asText();
+            String featureOfInterest = messageAttributes.get("hasFeatureOfInterest").asText();
 
-        String messageData = mess.get("data").asText();
-        String messageDataDecoded = new String(Base64.getDecoder().decode(messageData));
+            String messageData = mess.get("data").asText();
+            String messageDataDecoded = new String(Base64.getDecoder().decode(messageData));
 
-        try {
-            InsertResultMessage insertMessage;
-            String unit = "";
-            float[] allowedRange = {0, 0};
-            SensorMetadata sensor = new SensorMetadata(madeBySensor);
-            for (int s = 0; s < sensor.observedProperties.size(); s++) {
-                if (sensor.observedProperties.get(s).id.equals(observedProperty)) {
-                    unit = sensor.observedProperties.get(s).unit;
-                    allowedRange = sensor.observedProperties.get(s).getMeasurementRange();
+            try {
+                InsertResultMessage insertMessage;
+                String unit = "";
+                float[] allowedRange = {0, 0};
+                SensorMetadata sensor = new SensorMetadata(madeBySensor);
+                for (int s = 0; s < sensor.observedProperties.size(); s++) {
+                    if (sensor.observedProperties.get(s).id.equals(observedProperty)) {
+                        unit = sensor.observedProperties.get(s).unit;
+                        allowedRange = sensor.observedProperties.get(s).getMeasurementRange();
+                    }
                 }
+
+                insertMessage = new InsertResultMessage(messageDataDecoded);
+                for (Map.Entry<String, String> entry : insertMessage.resultValues.entrySet()) {
+                    float resultValue = Float.parseFloat(entry.getValue());
+                    String resultTime = entry.getKey();
+//                    Observation observation = new Observation(madeBySensor, observedProperty, new HasResult(resultValue));
+                    Observation observation = new Observation();
+                    observation.setMadeBySensor(madeBySensor);
+                    observation.setResultValue(resultValue);
+                    observation.setObservedProperty(observedProperty);
+                    HasResult hasResult = new HasResult();
+                    hasResult.setNumericValue(resultValue);
+                    observation.setHasResult(hasResult);
+                    observation.setResultTime(resultTime);
+                    observation.setResultUnit(unit);
+                    observation.setFeatureOfInterest(featureOfInterest);
+                    String jsonObservation = mapper.writeValueAsString(observation);
+                    _collector.emit(new Values(jsonObservation, allowedRange, observedProperty, madeBySensor));
+                }
+                _collector.ack(tuple);
+            } catch (ParserConfigurationException | SAXException | IOException ex) {
+                Logger.getLogger(MessageAtomizer.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            insertMessage = new InsertResultMessage(messageDataDecoded);
-            for (Map.Entry<String, String> entry : insertMessage.resultValues.entrySet()) {
-                float resultValue = Float.parseFloat(entry.getValue());
-                String resultTime = entry.getKey();
-                Observation observation = new Observation(madeBySensor, observedProperty, resultValue);
-                observation.setResultTime(resultTime);
-                observation.setResultUnit(unit);
-                observation.setFeatureOfInterest(featureOfInterest);
-                _collector.emit(new Values(observation, allowedRange, observedProperty, madeBySensor));
-            }
-            _collector.ack(tuple);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(MessageAtomizer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
