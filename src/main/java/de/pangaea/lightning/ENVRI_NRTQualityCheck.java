@@ -55,24 +55,24 @@ public class ENVRI_NRTQualityCheck {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 1);
-        builder.setBolt("MessageAtomizer", new MessageAtomizer(), 1).fieldsGrouping("MessageReader", new Fields("observationmessage"));
-        builder.setBolt("RangeCheckController", new RangeCheckController(), 1).fieldsGrouping("MessageAtomizer", new Fields("observedProperty"));
+        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 2);
+        builder.setBolt("MessageAtomizer", new MessageAtomizer(), 2).fieldsGrouping("MessageReader", new Fields("observationmessage"));
+        builder.setBolt("RangeCheckController", new RangeCheckController(), 2).fieldsGrouping("MessageAtomizer", new Fields("observedProperty"));
         //will fail if more than 20 parameters are submitted in parallel because of grouping -> number of working nodes=20
-        builder.setBolt("OutlierController", new OutlierController().withWindow(new Count(OutlierWindowSize), new Count(1)), 1)
+        builder.setBolt("OutlierController", new OutlierController().withWindow(new Count(OutlierWindowSize), new Count(1)), 2)
                 .fieldsGrouping("RangeCheckController", new Fields("observedProperty"));
         builder.setBolt("QualityControlledMessagePacker", new QualityControlledRabbitMessagePacker()
-                .withTumblingWindow(new Count(20)), 1)
+                .withTumblingWindow(new Count(20)), 2)
                 .fieldsGrouping("OutlierController", new Fields("observedProperty"));
         Config conf = new Config();
-        conf.setDebug(false);
-        conf.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 10000);
+        conf.setDebug(true);
+        conf.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 1000);
         conf.setSkipMissingKryoRegistrations(false);
         conf.setMaxSpoutPending(5000);
         conf.setStatsSampleRate(1.0d);
         if (args != null && args.length > 0) {
             try {
-                conf.setNumWorkers(1);
+                conf.setNumWorkers(10);
                 StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
             } catch (AlreadyAliveException | InvalidTopologyException | AuthorizationException ex) {
                 Logger.getLogger(ENVRI_NRTQualityCheck.class.getName()).log(Level.SEVERE, null, ex);
