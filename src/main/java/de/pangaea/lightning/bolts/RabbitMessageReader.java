@@ -5,21 +5,37 @@
  */
 package de.pangaea.lightning.bolts;
 
+import com.rabbitmq.client.AMQP;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.storm.Config;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.KillOptions;
+import org.apache.storm.generated.Nimbus;
+import org.apache.storm.generated.Nimbus.Client;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.thrift.TException;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.NimbusClient;
 import org.apache.storm.utils.Utils;
+
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 public class RabbitMessageReader extends BaseRichSpout {
 
@@ -29,8 +45,11 @@ public class RabbitMessageReader extends BaseRichSpout {
     static SpoutOutputCollector _collector;
     private Date start;
     int messageLen = 20;
+    int counter = 0;
     String pattern = "d-MM-YY_HH:mm:ss";
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+    private ConnectionFactory factory;
+    private String taskQeueName = "measures";
 
     public RabbitMessageReader() {
         this(true);
@@ -47,41 +66,44 @@ public class RabbitMessageReader extends BaseRichSpout {
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         _collector = collector;
+        factory = new ConnectionFactory();
+
+        String rabbitMQHost = System.getenv("RABBIT_HOST");
+        if (rabbitMQHost == null) {
+            rabbitMQHost = null;
+        }
+        factory.setHost(rabbitMQHost);
     }
 
     @Override
     public void nextTuple() {
-        Random r = new Random();
-        for (int i = 0; i < messageLen; i++) {
-            Date now = new Date();
-            String dateStr = simpleDateFormat.format(now);
-            String measurement = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><sos:InsertResult xmlns:sos=\"http://www.opengis.net/sos/2.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" service=\"SOS\" version=\"2.0.0\" xsi:schemaLocation=\"http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd\"><sos:template>http://dataportals.pangaea.de/sml/db/ptube/ssw_59e9a8161cfb2.xml</sos:template><sos:resultValues>"
-                    + dateStr + "#" + 000631 + "#"
-                    + (7 + (9 - 0) * r.nextDouble()) + "#"
-                    + (20 + (21 - 0) * r.nextDouble()) + "#"
-                    + 1 + "#"
-                    + (0.0006419 + (0.0007419 - 0) * r.nextDouble()) + "#"
-                    + (4 + (5 - 0) * r.nextDouble()) + "#"
-                    + (50 + (51 - 0) * r.nextDouble()) + "#"
-                    + (4 + (5 - 0) * r.nextDouble())
-                    + "@</sos:resultValues></sos:InsertResult>";
+        try {
+            final Connection connection = factory.newConnection();
+            final Channel channel = connection.createChannel();
+            channel.queueDeclare(taskQeueName, true, false, false, null);
+            channel.basicQos(1);
+            final Consumer consumer = new DefaultConsumer(channel) {
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 
-            String messageDataEnc = new String(Base64.getEncoder().encode(measurement.getBytes()));
+                    String jsonString = new String(body, "UTF-8");
+                    try {
+                        _collector.emit(new Values(jsonString), jsonString.hashCode());
+                        ack(jsonString.hashCode());
 
-            String jsonString = "{"
-                    + "    \"attributes\":"
-                    + "    {"
-                    + "      \"madeBySensor\":\"http://dataportals.pangaea.de/sml/db/ptube/ssw_59e9a8161cfb2.xml\","
-                    + "      \"hasFeatureOfInterest\":\"http://example.org/features/1\","
-                    + "      \"observedProperty\":\"http://purl.obolibrary.org/obo/PATO_0000146\""
-                    + "    },"
-                    + "    \"data\":\"" + messageDataEnc + "\""
-                    + "}";
+                    } finally {
+                        if (channel.isOpen()) {
+                            channel.basicAck(envelope.getDeliveryTag(), false);
+                        }
+                    }
+                }
+            };
+            channel.basicConsume(taskQeueName, false, consumer);
 
-            _collector.emit(new Values(jsonString), jsonString.hashCode());
-            this.ack(jsonString.hashCode());
-//            Utils.sleep(sleepTime);
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(RabbitMessageReader.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     @Override

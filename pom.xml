@@ -48,7 +48,7 @@
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-core</artifactId>
             <version>1.2.1</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -64,6 +64,18 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.christiangda</groupId>
+            <artifactId>storm-metrics-influxdb</artifactId>
+            <version>1.0.4</version>
+        </dependency>        
+        
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.2.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -56,7 +56,7 @@ public class QualityControlledRabbitMessagePacker extends BaseWindowedBolt {
             datamessage = new String(encodedjsonObs);
 
             message = messagehead + datamessage + "\"}]}";
-            System.out.println("Sending Quality Controlled Message Package");
+//            System.out.println("Sending Quality Controlled Message Package");
 //            System.err.println(message);
             System.err.println(jsonObs);
 

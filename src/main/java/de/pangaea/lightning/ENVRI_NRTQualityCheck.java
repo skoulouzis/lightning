@@ -70,6 +70,33 @@ public class ENVRI_NRTQualityCheck {
         conf.setSkipMissingKryoRegistrations(false);
         conf.setMaxSpoutPending(5000);
         conf.setStatsSampleRate(1.0d);
+//        String influxURI = System.getenv("INFLUX_URI");
+//        if (influxURI != null) {
+//            conf.registerMetricsConsumer(com.github.christiangda.storm.metrics.InfluxDBMetricsConsumer.class, 1);
+//            conf.put("metrics.reporter.name", "InfluxDBMetricsConsumer");
+//
+//            conf.put("metrics.influxdb.url", influxURI);
+////    conf.put("metrics.influxdb.username", "<YOUR_INFLUXDB_USERNAME>");
+////    conf.put("metrics.influxdb.password", "<YOUR_INFLUXDB_PASSWORD>");
+//            String influxDB = System.getenv("INFLUX_DB");
+//            if (influxDB != null) {
+//                conf.put("metrics.influxdb.database", influxDB);
+//            } else {
+//                conf.put("metrics.influxdb.database", "mydb");
+//            }
+//
+//            String topologyName = (String) conf.get(Config.TOPOLOGY_NAME);
+//            String measurmentPrefix;
+//
+//            if (topologyName != null) {
+//                measurmentPrefix = topologyName;
+//            } else {
+//                measurmentPrefix = "storm";
+//            }
+//            conf.put("metrics.influxdb.measurement.prefix", measurmentPrefix);
+////    conf.put("metrics.influxdb.enable.gzip", <true or false>);
+//        }
+
         if (args != null && args.length > 0) {
             try {
                 conf.setNumWorkers(10);
