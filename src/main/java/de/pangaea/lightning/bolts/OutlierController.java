@@ -69,6 +69,7 @@ public class OutlierController extends BaseWindowedBolt {
                     } catch (IOException ex) {
                         Logger.getLogger(OutlierController.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    collector.ack(tuple);
                 }
                 double[] absDeviationFromMedian = new double[valuesToCheck.length];
                 Median m = new Median();
@@ -99,6 +100,7 @@ public class OutlierController extends BaseWindowedBolt {
                 String jsonMiddleobs = mapper.writeValueAsString(middleobs);
 
                 collector.emit(new Values(jsonMiddleobs, observedPoperty, madeBySensor));
+
             } catch (JsonProcessingException ex) {
                 Logger.getLogger(OutlierController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -114,6 +116,7 @@ public class OutlierController extends BaseWindowedBolt {
                     madeBySensor = (String) lasttuple.getValue(2);
                     String jsonLastobs = mapper.writeValueAsString(lastobs);
                     collector.emit(new Values(jsonLastobs, observedPoperty, madeBySensor));
+                    collector.ack(lasttuple);
 //System.out.println(" obs: "+(tuplesInWindow.size()-1)+" "+((Observation) tuplesInWindow.get(tuplesInWindow.size()-1).getValue(0)).getResultValue());
                 } catch (IOException ex) {
                     Logger.getLogger(OutlierController.class.getName()).log(Level.SEVERE, null, ex);

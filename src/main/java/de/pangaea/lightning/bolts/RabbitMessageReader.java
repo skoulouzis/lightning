@@ -70,7 +70,7 @@ public class RabbitMessageReader extends BaseRichSpout {
 
         String rabbitMQHost = System.getenv("RABBIT_HOST");
         if (rabbitMQHost == null) {
-            rabbitMQHost = null;
+            rabbitMQHost = "localhost";
         }
         factory.setHost(rabbitMQHost);
     }

@@ -24,7 +24,7 @@ def send_observation(connection):
                         properties=pika.BasicProperties(
                             delivery_mode = 2, # make message persistent
                         ))
-    print(" [x] Sent %r" % jsonString)
+    print("Sent %r" % jsonString)
     
 
 
@@ -32,11 +32,12 @@ def send_observation(connection):
 
 if __name__ == "__main__":
     RABBIT_HOST = sys.argv[1]
+    num_of_messages = int(sys.argv[2])
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_HOST))
     channel = connection.channel()
     channel.queue_declare(queue='measures', durable=True)
     
-    for i in range(1,10000):
+    for i in range(0,num_of_messages):
         send_observation(connection)
         
     connection.close()
