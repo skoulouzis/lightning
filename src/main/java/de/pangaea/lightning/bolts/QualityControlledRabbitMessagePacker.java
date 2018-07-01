@@ -13,10 +13,8 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MessageProperties;
 import de.pangaea.lightning.Observation;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -76,7 +74,8 @@ public class QualityControlledRabbitMessagePacker extends BaseWindowedBolt {
             }
             String datamessage;
 
-            String messagehead = "{\"messages\": [{\"attributes\":{\"madeBySensor\":\"" + madeBySensor + "\",\"observedProperty\":\"" + observedProperty + "\"},\"data\":\"";
+            String messagehead = "{\"messages\": [{\"attributes\":{\"madeBySensor\":\"" + 
+                    madeBySensor + "\",\"observedProperty\":\"" + observedProperty + "\"},\"data\":\"";
             String jsonObs = mapper.writeValueAsString(packObs);
             byte[] encodedjsonObs = Base64.getEncoder().encode(jsonObs.getBytes());
             datamessage = new String(encodedjsonObs);

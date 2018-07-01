@@ -40,7 +40,8 @@ public class RangeCheckController extends BaseRichBolt {
             if (range[0] < range[1]) {
                 if (value >= range[0] && value <= range[1]) {
                     //System.out.println("Passed: "+value+" ("+range[0]+" - "+range[1]+")");
-                    if (rangeCheckedObservation.getQualityOfObservation() != 1) {
+                    if (rangeCheckedObservation.getQualityOfObservation() == null || 
+                            rangeCheckedObservation.getQualityOfObservation() != 1) {
                         rangeCheckedObservation.setQualityOfObservation(0);
                     }
                 } else {

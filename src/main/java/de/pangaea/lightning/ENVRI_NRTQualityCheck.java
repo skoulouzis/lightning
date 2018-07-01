@@ -71,6 +71,7 @@ public class ENVRI_NRTQualityCheck {
 //        conf.setMaxSpoutPending(5000);
         conf.setStatsSampleRate(1.0d);
         String influxURI = System.getenv("INFLUX_URI");
+//        String influxURI = "http://172.17.0.3:8086";
         if (influxURI != null) {
             conf.registerMetricsConsumer(com.github.christiangda.storm.metrics.InfluxDBMetricsConsumer.class, 1);
             conf.put("metrics.reporter.name", "InfluxDBMetricsConsumer");
