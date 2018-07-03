@@ -34,13 +34,15 @@ def send_observation(connection):
 
 if __name__ == "__main__":
     RABBIT_HOST = sys.argv[1]
-    num_of_messages = int(sys.argv[2]) #6000 for 1 min
+    #num_of_messages = int(sys.argv[2])
+    rate = int(sys.argv[2])
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_HOST))
     channel = connection.channel()
     channel.queue_declare(queue='measures', durable=True)
     
-    for i in range(0,num_of_messages):
-        send_observation(connection)
-        time.sleep(0.01)
+    while True:
+        for i in range(0,rate):
+            send_observation(connection)
+        time.sleep(1)
         
     connection.close()
