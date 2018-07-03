@@ -69,7 +69,7 @@ public class ENVRI_NRTQualityCheck {
         conf.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 1000);
         conf.setSkipMissingKryoRegistrations(false);
 //        conf.setMaxSpoutPending(5000);
-        conf.setStatsSampleRate(1.0d);
+        conf.setStatsSampleRate(1);
         String influxURI = System.getenv("INFLUX_URI");
 //        String influxURI = "http://172.17.0.3:8086";
         if (influxURI != null) {

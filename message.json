@@ -1,0 +1,13 @@
+{
+  "messages": [
+    {
+      "data": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c29zOkluc2VydFJlc3VsdCB4bWxuczpzb3M9Imh0dHA6Ly93d3cub3Blbmdpcy5uZXQvc29zLzIuMCIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSIgc2VydmljZT0iU09TIiB2ZXJzaW9uPSIyLjAuMCIgeHNpOnNjaGVtYUxvY2F0aW9uPSJodHRwOi8vd3d3Lm9wZW5naXMubmV0L3Nvcy8yLjAgaHR0cDovL3NjaGVtYXMub3Blbmdpcy5uZXQvc29zLzIuMC9zb3MueHNkIj48c29zOnRlbXBsYXRlPmh0dHA6Ly9kYXRhcG9ydGFscy5wYW5nYWVhLmRlL3NtbC90LXNvcy9wcmVzX3RlbXBsYXRlLnhtbDwvc29zOnRlbXBsYXRlPjxzb3M6cmVzdWx0VmFsdWVzPjIwMTgtMDYtMDZUMDc6MDM6NTUuMjQ0MjI2Izk5NEBAMjAxOC0wNi0wNlQwNzowMzo1Ni4yNzczMzAjOTk1QEAyMDE4LTA2LTA2VDA3OjAzOjU3LjMyMzIzNCM5OTVAQDIwMTgtMDYtMDZUMDc6MDM6NTguMzc3NTQ2Izk5MkBAMjAxOC0wNi0wNlQwNzowMzo1OS40NDgxMTkjOTk3QEAyMDE4LTA2LTA2VDA3OjA0OjAwLjUwMzYxMyM5OTdAQDIwMTgtMDYtMDZUMDc6MDQ6MDEuNTc0NjI1Izk5NkBAMjAxOC0wNi0wNlQwNzowNDowMi42Mjk2MTAjOTk2QEAyMDE4LTA2LTA2VDA3OjA0OjAzLjY4NTMxNiM5OTVAQDIwMTgtMDYtMDZUMDc6MDQ6MDQuNzU2Mjc3Izk5NUBAPC9zb3M6cmVzdWx0VmFsdWVzPjwvc29zOkluc2VydFJlc3VsdD4=",
+      "attributes": {
+        "madeBySensor": "http://dataportals.pangaea.de/sml/db/ptube/ssw_59e9a8161cfb2.xml",
+        "observedProperty": "http://purl.obolibrary.org/obo/PATO_0001025",
+        "hasFeatureOfInterest": "http://vocab.nerc.ac.uk/collection/L04/current/L04001/",
+        "type": "InsertResult"
+      }
+    }
+  ]
+}
