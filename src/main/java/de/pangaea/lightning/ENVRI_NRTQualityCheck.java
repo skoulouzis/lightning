@@ -55,14 +55,14 @@ public class ENVRI_NRTQualityCheck {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 2);
-        builder.setBolt("MessageAtomizer", new MessageAtomizer(), 2).fieldsGrouping("MessageReader", new Fields("observationmessage"));
-        builder.setBolt("RangeCheckController", new RangeCheckController(), 2).fieldsGrouping("MessageAtomizer", new Fields("observedProperty"));
+        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 1);
+        builder.setBolt("MessageAtomizer", new MessageAtomizer(), 1).fieldsGrouping("MessageReader", new Fields("observationmessage"));
+        builder.setBolt("RangeCheckController", new RangeCheckController(), 1).fieldsGrouping("MessageAtomizer", new Fields("observedProperty"));
         //will fail if more than 20 parameters are submitted in parallel because of grouping -> number of working nodes=20
-        builder.setBolt("OutlierController", new OutlierController().withWindow(new Count(OutlierWindowSize), new Count(1)), 2)
+        builder.setBolt("OutlierController", new OutlierController().withWindow(new Count(OutlierWindowSize), new Count(1)), 1)
                 .fieldsGrouping("RangeCheckController", new Fields("observedProperty"));
         builder.setBolt("QualityControlledMessagePacker", new QualityControlledRabbitMessagePacker()
-                .withTumblingWindow(new Count(20)), 2)
+                .withTumblingWindow(new Count(1)), 1)
                 .fieldsGrouping("OutlierController", new Fields("observedProperty"));
         Config conf = new Config();
         conf.setDebug(true);
@@ -100,7 +100,7 @@ public class ENVRI_NRTQualityCheck {
 
         if (args != null && args.length > 0) {
             try {
-                conf.setNumWorkers(10);
+                conf.setNumWorkers(1);
                 StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
             } catch (AlreadyAliveException | InvalidTopologyException | AuthorizationException ex) {
                 Logger.getLogger(ENVRI_NRTQualityCheck.class.getName()).log(Level.SEVERE, null, ex);
