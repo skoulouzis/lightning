@@ -55,7 +55,7 @@ public class ENVRI_NRTQualityCheck {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 1);
+        builder.setSpout("MessageReader", new RabbitMessageReader("envri_sub_101"), 2);
         builder.setBolt("MessageAtomizer", new MessageAtomizer(), 1).fieldsGrouping("MessageReader", new Fields("observationmessage"));
         builder.setBolt("RangeCheckController", new RangeCheckController(), 1).fieldsGrouping("MessageAtomizer", new Fields("observedProperty"));
         //will fail if more than 20 parameters are submitted in parallel because of grouping -> number of working nodes=20
@@ -100,7 +100,7 @@ public class ENVRI_NRTQualityCheck {
 
         if (args != null && args.length > 0) {
             try {
-                conf.setNumWorkers(1);
+                conf.setNumWorkers(2);
                 StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
             } catch (AlreadyAliveException | InvalidTopologyException | AuthorizationException ex) {
                 Logger.getLogger(ENVRI_NRTQualityCheck.class.getName()).log(Level.SEVERE, null, ex);
