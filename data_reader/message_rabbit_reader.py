@@ -43,8 +43,11 @@ def write_to_influx(observations):
         data_string = ""
         for observation in observations:
             sensor = observation['madeBySensor']    
-            unit = observation['resultUnit']    
-            quality = observation['qualityOfObservation']    
+            unit = observation['resultUnit']
+            if 'qualityOfObservation' in observation:
+                quality = observation['qualityOfObservation']
+            else:
+                quality = 1
             value = observation['resultValue']    
             time = observation['resultTime']
             millis = int(round(float(time) * 1000))

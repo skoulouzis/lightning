@@ -34,15 +34,22 @@ def send_observation(connection):
 
 if __name__ == "__main__":
     RABBIT_HOST = sys.argv[1]
-    #num_of_messages = int(sys.argv[2])
     rate = int(sys.argv[2])
+    limit = None
+    if  len(sys.argv) > 3:
+        limit = sys.argv[3]
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_HOST))
     channel = connection.channel()
     channel.queue_declare(queue='measures', durable=True)
     
-    while True:
+    count = 0;
+    done = False
+    while not done:
         for i in range(0,rate):
             send_observation(connection)
+            count +=1
+            if limit and count >= int(limit):
+                done = True
         time.sleep(1)
         
     connection.close()
